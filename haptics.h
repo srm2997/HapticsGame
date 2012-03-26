@@ -108,7 +108,7 @@ private:
 	double& m_ypos;
 	double m_paddleWidth;
 
-	bool dobump;
+	int dobump;
 };
 
 #endif // HAPTICS_H

@@ -49,7 +49,7 @@ HapticsClass::HapticsClass( double& xposb, double& yposb)
       m_inited(false),
 	  m_xpos(xposb),
 	  m_ypos(yposb),
-	  dobump(false)
+	  dobump(0)
 {
     for (int i = 0; i < 3; i++)
         m_positionServo[i] = 0;
@@ -205,7 +205,7 @@ void HapticsClass::vecMultMatrix(double srcVec[3], double mat[16], double dstVec
 }
 
 void HapticsClass::bump(){
-	dobump = true;
+	dobump += 20;
 }
 
 // Here is where the heavy calculations are done.  This function is
@@ -214,6 +214,14 @@ void HapticsClass::bump(){
 // used.
 void HapticsClass::cubeContact()
 {
+	if( dobump > 0 ){
+		m_forceServo[0] = 10;
+		m_forceServo[1] = 0;
+		m_forceServo[2] = 0;
+		dobump--;
+		return;
+	}
+
     // Convert from device coordinates to application coordinates.
     vecMultMatrix(m_positionServo, m_transformMat, m_positionApp);
 

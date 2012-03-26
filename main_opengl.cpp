@@ -297,6 +297,7 @@ void BoundCheck( long double i ){
 			xmov = -xmov;
 			xmov *= 1.1;
 			ymov *= 1.1;
+			gHaptics.bump();
 		}else{
 			xposb = 0;
 			xmov = 0.7;
