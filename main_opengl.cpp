@@ -16,6 +16,7 @@
 #include <math.h>
 #include "haptics.h"
 #include <sstream>
+#include <shlobj.h>
 
 
 double NORTH = 1.0;
@@ -298,6 +299,10 @@ void BoundCheck( long double i ){
 			xmov *= 1.1;
 			ymov *= 1.1;
 			gHaptics.bump();
+			char path[ MAX_PATH ];
+			SHGetFolderPathA( NULL, CSIDL_PROFILE, NULL, 0, path );
+			strcat(path,"\\Documents\\HapticsGame\\rightPaddleHit.wav");
+			PlaySound(path, NULL, SND_ASYNC | SND_FILENAME);
 		}else{
 			xposb = 0;
 			xmov = 0.7;
@@ -313,6 +318,10 @@ void BoundCheck( long double i ){
 			xmov = -xmov;
 			xmov *= 1.1;
 			ymov *= 1.1;
+			char path[ MAX_PATH ];
+			SHGetFolderPathA( NULL, CSIDL_PROFILE, NULL, 0, path );
+			strcat(path,"\\Documents\\HapticsGame\\leftPaddleHit.wav");
+			PlaySound(path, NULL, SND_ASYNC | SND_FILENAME);
 		}else{
 			xposb = 0;
 			xmov = -0.7;
