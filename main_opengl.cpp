@@ -305,7 +305,7 @@ void BoundCheck( long double i ){
 			gHaptics.bump();
 			char path[ MAX_PATH ];
 			SHGetFolderPathA( NULL, CSIDL_PROFILE, NULL, 0, path );
-			strcat(path,"rightPaddleHit.wav");
+			strcat(path,"\\Documents\\HapticsGame\\rightPaddleHit.wav");
 			PlaySound(path, NULL, SND_ASYNC | SND_FILENAME);
 		}else{
 			xposb = 0;
@@ -393,7 +393,8 @@ void drawGraphics()
 
 	// Draw puck
     glTranslatef( xposb, yposb, 0);
-    glutSolidCube(gCubeEdgeLength);
+    //glutSolidCube(gCubeEdgeLength);
+	glutSolidSphere( gCubeEdgeLength / 2, 20, 10 );
 	glTranslatef(-xposb, -yposb, 0);
 
 	// Draw top
