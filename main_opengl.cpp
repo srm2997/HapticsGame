@@ -263,6 +263,10 @@ void Score(){
 	sprintf( letters, "%i - %i", SCORE_P2, SCORE_P1  );
 	OutputDebugString( letters );
 	OutputDebugString("\n" );
+	char path[ MAX_PATH ];
+	SHGetFolderPathA( NULL, CSIDL_PROFILE, NULL, 0, path );
+	strcat(path,"\\Documents\\HapticsGame\\ballOut.wav");
+	PlaySound(path, NULL, SND_ASYNC | SND_FILENAME);
 }
 
 void BoundCheck( long double i ){
