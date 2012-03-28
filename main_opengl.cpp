@@ -313,6 +313,7 @@ void BoundCheck( long double i ){
 			ymov = 0.7;
 			SCORE_P2++;
 			Score();
+			gHaptics.jitter();
 		}
 	}
 

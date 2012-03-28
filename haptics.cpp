@@ -49,7 +49,8 @@ HapticsClass::HapticsClass( double& xposb, double& yposb)
       m_inited(false),
 	  m_xpos(xposb),
 	  m_ypos(yposb),
-	  dobump(0)
+	  dobump(0),
+	  dojitter(0)
 {
     for (int i = 0; i < 3; i++)
         m_positionServo[i] = 0;
@@ -207,6 +208,9 @@ void HapticsClass::vecMultMatrix(double srcVec[3], double mat[16], double dstVec
 void HapticsClass::bump(){
 	dobump += 20;
 }
+void HapticsClass::jitter(){
+	dojitter += 200;
+}
 
 // Here is where the heavy calculations are done.  This function is
 // called from ContactCB to calculate the forces based on current
@@ -219,6 +223,20 @@ void HapticsClass::cubeContact()
 		m_forceServo[1] = 0;
 		m_forceServo[2] = 0;
 		dobump--;
+		return;
+	}
+
+	if( dojitter > 0 ){
+		if( dojitter % 40 < 20 ){
+			m_forceServo[0] = 10;
+			m_forceServo[1] = 0;
+			m_forceServo[2] = 0;
+		}else{
+			m_forceServo[0] = -10;
+			m_forceServo[1] = 0;
+			m_forceServo[2] = 0;
+		}
+		dojitter--;
 		return;
 	}
 
@@ -242,8 +260,8 @@ void HapticsClass::cubeContact()
 
 
     // add spring stiffness to force effect
-    m_forceServo[0] += (m_positionApp[0] - m_xpos - m_paddleWidth * 1.5) * -5;
-    m_forceServo[1] += (m_positionApp[1] - m_ypos) * -5;
+    m_forceServo[0] += (m_positionApp[0] - m_xpos - m_paddleWidth * 1.5) * -2;
+    m_forceServo[1] += (m_positionApp[1] - m_ypos) * -2;
 }
 
 // Interface function to get current position
