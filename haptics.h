@@ -18,6 +18,13 @@ enum RS_Face {
     FACE_LAST               // reserved to allow iteration over faces
     };
 
+enum HapCoord {
+	X = 0,
+	Y = 1,
+	Z = 2
+	};
+
+
 // Blocking values
 const bool bNonBlocking = false;
 const bool bBlocking = true;
@@ -109,6 +116,8 @@ private:
 	double m_paddleWidth;
 
 	int dobump;
+
+	double prevY;
 };
 
 #endif // HAPTICS_H
