@@ -49,7 +49,8 @@ HapticsClass::HapticsClass( double& xposb, double& yposb)
       m_inited(false),
 	  m_xpos(xposb),
 	  m_ypos(yposb),
-	  dobump(0)
+	  dobump(0),
+	  dojitter(0)
 {
     for (int i = 0; i < 3; i++)
         m_positionServo[i] = 0;
@@ -207,6 +208,9 @@ void HapticsClass::vecMultMatrix(double srcVec[3], double mat[16], double dstVec
 void HapticsClass::bump(){
 	dobump += 20;
 }
+void HapticsClass::jitter(){
+	dojitter += 200;
+}
 
 // Here is where the heavy calculations are done.  This function is
 // called from ContactCB to calculate the forces based on current
@@ -219,6 +223,20 @@ void HapticsClass::cubeContact()
 		m_forceServo[1] = 0;
 		m_forceServo[2] = 0;
 		dobump--;
+		return;
+	}
+
+	if( dojitter > 0 ){
+		if( dojitter % 40 < 20 ){
+			m_forceServo[0] = 10;
+			m_forceServo[1] = 0;
+			m_forceServo[2] = 0;
+		}else{
+			m_forceServo[0] = -10;
+			m_forceServo[1] = 0;
+			m_forceServo[2] = 0;
+		}
+		dojitter--;
 		return;
 	}
 
@@ -240,7 +258,6 @@ void HapticsClass::cubeContact()
 
 	double d = m_xpos * m_xpos + m_ypos * m_ypos;
 
-
 	if ( m_ypos - m_positionApp[Y] > 0.0 && m_positionApp[Y]-prevY > 0.1 ) {
 		char letters[100];
 		sprintf( letters, "Moving Toward Up\n");
@@ -261,7 +278,7 @@ void HapticsClass::cubeContact()
 		m_forceServo[Y] += (m_positionApp[Y] - m_ypos) * -5;
 	}
 
-	//m_forceServo[X] += (m_positionApp[X] - m_xpos - m_paddleWidth * 1.5) * -5;
+	m_forceServo[X] += (m_positionApp[X] - m_xpos - m_paddleWidth * 1.5) * -5;
 
 	prevY = m_positionApp[Y];
 }

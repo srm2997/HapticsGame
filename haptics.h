@@ -64,6 +64,7 @@ public:
     bool isDeviceCalibrated();
 
 	void bump();
+	void jitter();
 
 private:
     // Move data between servo and app variables
@@ -116,8 +117,8 @@ private:
 	double m_paddleWidth;
 
 	int dobump;
-
 	double prevY;
+	int dojitter;
 };
 
 #endif // HAPTICS_H
