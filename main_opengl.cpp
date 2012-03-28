@@ -305,7 +305,7 @@ void BoundCheck( long double i ){
 			gHaptics.bump();
 			char path[ MAX_PATH ];
 			SHGetFolderPathA( NULL, CSIDL_PROFILE, NULL, 0, path );
-			strcat(path,"\\Documents\\HapticsGame\\rightPaddleHit.wav");
+			strcat(path,"rightPaddleHit.wav");
 			PlaySound(path, NULL, SND_ASYNC | SND_FILENAME);
 		}else{
 			xposb = 0;
@@ -395,6 +395,36 @@ void drawGraphics()
     glTranslatef( xposb, yposb, 0);
     glutSolidCube(gCubeEdgeLength);
 	glTranslatef(-xposb, -yposb, 0);
+
+	// Draw top
+	//glDisable(GL_DEPTH_TEST);
+	////glDepthMask(GL_FALSE);
+
+	////Define the color (blue)
+	//glColor3ub(255, 0, 0);
+	//glBegin(GL_QUADS);
+
+	//  //Draw our four points, clockwise.
+	//  glVertex2d(0, 0);
+	//  glVertex2d(10, 0);
+	//  glVertex2d(10, 10);
+	//  glVertex2d(0, 10);
+	//glEnd();
+
+	//glEnable(GL_DEPTH_TEST);
+	////glDepthMask(!GL_FALSE);
+	double width = ( EAST - WEST ) * 2;
+	glTranslatef( 0, NORTH + width / 2, 0 );
+	glScalef( 1, 1, 1 / width / 2 );
+	glutSolidCube(width);
+	glScalef( 1, 1, width * 2 );
+	glTranslatef( 0, -(NORTH + width / 2), 0 );
+
+	glTranslatef( 0, (SOUTH - width / 2), 0 );
+	glScalef( 1, 1, 1 / width / 2 );
+	glutSolidCube( width );
+	glScalef( 1, 1, width * 2 );
+	glTranslatef( 0, -(SOUTH - width / 2), 0 );
 
 	// Update puck position
 	UpdatePos();
