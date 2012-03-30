@@ -27,6 +27,8 @@ double WEST = -1.5;
 int SCORE_P1 = 0;
 int SCORE_P2 = 0;
 
+enum Sound { LEFT_HIT, RIGHT_HIT, SCORE };
+
 double xposb, yposb;
 double yposp1, xposp1;
 double yposp2, xposp2;
@@ -61,6 +63,8 @@ void drawGraphics();
 void drawCursor();
 
 void glutMouseMove(int x, int y);
+
+void playSound( Sound sound );
 
 
 
@@ -263,10 +267,7 @@ void Score(){
 	sprintf( letters, "%i - %i", SCORE_P2, SCORE_P1  );
 	OutputDebugString( letters );
 	OutputDebugString("\n" );
-	char path[ MAX_PATH ];
-	SHGetFolderPathA( NULL, CSIDL_PROFILE, NULL, 0, path );
-	strcat(path,"\\Documents\\HapticsGame\\ballOut.wav");
-	PlaySound(path, NULL, SND_ASYNC | SND_FILENAME);
+	playSound( SCORE );
 }
 
 void BoundCheck( long double i ){
@@ -303,10 +304,7 @@ void BoundCheck( long double i ){
 			xmov *= 1.1;
 			ymov *= 1.1;
 			gHaptics.bump();
-			char path[ MAX_PATH ];
-			SHGetFolderPathA( NULL, CSIDL_PROFILE, NULL, 0, path );
-			strcat(path,"\\Documents\\HapticsGame\\rightPaddleHit.wav");
-			PlaySound(path, NULL, SND_ASYNC | SND_FILENAME);
+			playSound( RIGHT_HIT );
 		}else{
 			xposb = 0;
 			xmov = 0.7;
@@ -323,10 +321,7 @@ void BoundCheck( long double i ){
 			xmov = -xmov;
 			xmov *= 1.1;
 			ymov *= 1.1;
-			char path[ MAX_PATH ];
-			SHGetFolderPathA( NULL, CSIDL_PROFILE, NULL, 0, path );
-			strcat(path,"\\Documents\\HapticsGame\\leftPaddleHit.wav");
-			PlaySound(path, NULL, SND_ASYNC | SND_FILENAME);
+			playSound( LEFT_HIT );
 		}else{
 			xposb = 0;
 			xmov = -0.7;
@@ -430,6 +425,28 @@ void drawGraphics()
 	// Update puck position
 	UpdatePos();
 }
+
+
+void playSound( Sound sound ){
+	char path[MAX_PATH];
+	SHGetFolderPathA( NULL, CSIDL_PROFILE, NULL, 0, path );
+	strcat( path, "\\Documents\\HapticsGame\\");
+
+	switch( sound ){
+		case LEFT_HIT:
+			strcat( path, "leftPaddleHit.wav");
+			break;
+		case RIGHT_HIT:
+			strcat( path, "rightPaddleHit.wav");
+			break;
+		case SCORE:
+			strcat( path, "ballOut.wav");
+			break;
+	}
+
+	PlaySound(path, NULL, SND_ASYNC | SND_FILENAME);
+}
+
 
 // Draw the cursor
 void drawCursor()
