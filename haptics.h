@@ -119,6 +119,8 @@ private:
 	int dobump;
 	double prevY;
 	int dojitter;
+	int doPullDown;
+	int doPullUp;
 };
 
 #endif // HAPTICS_H

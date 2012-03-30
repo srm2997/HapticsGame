@@ -50,7 +50,9 @@ HapticsClass::HapticsClass( double& xposb, double& yposb)
 	  m_xpos(xposb),
 	  m_ypos(yposb),
 	  dobump(0),
-	  dojitter(0)
+	  dojitter(0),
+	  doPullDown(0),
+	  doPullUp(0)
 {
     for (int i = 0; i < 3; i++)
         m_positionServo[i] = 0;
@@ -174,6 +176,8 @@ void HapticsClass::testHDLError(const char* str)
 // need for the application to worry about threads.
 void HapticsClass::synchFromServo()
 {
+	if ( !m_inited )
+		return;
     hdlCreateServoOp(GetStateCB, this, bBlocking);
 }
 
@@ -218,6 +222,9 @@ void HapticsClass::jitter(){
 // used.
 void HapticsClass::cubeContact()
 {
+	// Skip the whole thing if not initialized
+    if (!m_inited) return;
+
 	if( dobump > 0 ){
 		m_forceServo[0] = 10;
 		m_forceServo[1] = 0;
@@ -240,15 +247,27 @@ void HapticsClass::cubeContact()
 		return;
 	}
 
+	if ( doPullDown > doPullUp ) {
+		doPullUp = 0;
+	} else {
+		doPullDown = 0;
+	}
+
+	if ( doPullDown > 0 ) {
+		//m_forceServo[Y] += (m_positionApp[Y] - m_ypos) * -5;
+		m_forceServo[Y] = -5;
+		doPullDown--;
+	} else if ( doPullUp > 0 ) {
+		m_forceServo[Y] = 5;
+		doPullUp--;
+	}
+
     // Convert from device coordinates to application coordinates.
     vecMultMatrix(m_positionServo, m_transformMat, m_positionApp);
 
     m_forceServo[X] = 0; 
     m_forceServo[Y] = 0; 
     m_forceServo[Z] = 0;
-
-    // Skip the whole thing if not initialized
-    if (!m_inited) return;
 
 
 //	char letters[100];
@@ -262,7 +281,7 @@ void HapticsClass::cubeContact()
 		char letters[100];
 		sprintf( letters, "Moving Toward Up\n");
 		OutputDebugString( letters );
-		m_forceServo[Y] = 2;
+		m_forceServo[Y] = -2;
 	} else if ( m_ypos - m_positionApp[Y] < 0.0 && m_positionApp[Y]-prevY < 0.1 ) {
 		char letters[100];
 		sprintf( letters, "Moving Toward Down\n");
@@ -275,7 +294,7 @@ void HapticsClass::cubeContact()
 
 		// add spring stiffness to force effect
 		
-		m_forceServo[Y] += (m_positionApp[Y] - m_ypos) * -5;
+		
 	}
 
 	m_forceServo[X] += (m_positionApp[X] - m_xpos - m_paddleWidth * 1.5) * -5;
