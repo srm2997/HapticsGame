@@ -225,7 +225,30 @@ void HapticsClass::cubeContact()
 	// Skip the whole thing if not initialized
     if (!m_inited) return;
 
+
+    // Convert from device coordinates to application coordinates.
+    vecMultMatrix(m_positionServo, m_transformMat, m_positionApp);
+    m_forceServo[X] = 0; 
+    m_forceServo[Y] = 0; 
+    m_forceServo[Z] = 0;
+
+	double paddle_top = m_positionApp[Y] + m_cubeEdgeLength / 2;
+	double paddle_bottom = m_positionApp[Y] - m_cubeEdgeLength / 2;
+
+	if( paddle_top > 1 ){
+		m_forceServo[Y] = (paddle_top - 1) * -100;
+	}
+	if( paddle_bottom < -1 ){
+		m_forceServo[Y] = ( paddle_bottom + 1) * -100;
+	}
+
+	/*char letters[100];
+	sprintf( letters, "Force: %f      Y-Pos: %f\n", m_forceServo[Y], m_positionApp[Y]  );
+	OutputDebugString( letters );*/
+
+
 	if( dobump > 0 ){
+		// Puck riccoched
 		m_forceServo[0] = 10;
 		m_forceServo[1] = 0;
 		m_forceServo[2] = 0;
@@ -234,6 +257,7 @@ void HapticsClass::cubeContact()
 	}
 
 	if( dojitter > 0 ){
+		// Was scored against
 		if( dojitter % 40 < 20 ){
 			m_forceServo[0] = 10;
 			m_forceServo[1] = 0;
@@ -247,6 +271,11 @@ void HapticsClass::cubeContact()
 		return;
 	}
 
+	
+	m_forceServo[Y] += (m_positionApp[Y] - m_ypos) * -5;
+	m_forceServo[X] += (m_positionApp[X] - m_xpos - m_paddleWidth * 1.5) * -5;
+	return;
+
 	if ( doPullDown > doPullUp ) {
 		doPullUp = 0;
 	} else {
@@ -255,19 +284,14 @@ void HapticsClass::cubeContact()
 
 	if ( doPullDown > 0 ) {
 		//m_forceServo[Y] += (m_positionApp[Y] - m_ypos) * -5;
-		m_forceServo[Y] = -5;
+		m_forceServo[Y] += -5;
 		doPullDown--;
 	} else if ( doPullUp > 0 ) {
-		m_forceServo[Y] = 5;
+		m_forceServo[Y] += 5;
 		doPullUp--;
 	}
 
-    // Convert from device coordinates to application coordinates.
-    vecMultMatrix(m_positionServo, m_transformMat, m_positionApp);
 
-    m_forceServo[X] = 0; 
-    m_forceServo[Y] = 0; 
-    m_forceServo[Z] = 0;
 
 
 //	char letters[100];
@@ -281,12 +305,12 @@ void HapticsClass::cubeContact()
 		char letters[100];
 		sprintf( letters, "Moving Toward Up\n");
 		OutputDebugString( letters );
-		m_forceServo[Y] = -2;
+		m_forceServo[Y] += -2;
 	} else if ( m_ypos - m_positionApp[Y] < 0.0 && m_positionApp[Y]-prevY < 0.1 ) {
 		char letters[100];
 		sprintf( letters, "Moving Toward Down\n");
 		OutputDebugString( letters );
-		m_forceServo[Y] = 2;
+		m_forceServo[Y] += 2;
 	} else {
 		char letters[100];
 		sprintf( letters, "Not Moving Toward\n");
