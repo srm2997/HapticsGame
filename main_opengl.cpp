@@ -18,6 +18,7 @@
 #include <sstream>
 #include <shlobj.h>
 
+#define HAPTIC	0
 
 double NORTH = 1.0;
 double SOUTH = -1.0;
@@ -165,7 +166,9 @@ void initScene()
 	ymov = 0.7;
 
     // Call the haptics initialization function
-    gHaptics.init(gCubeEdgeLength, gStiffness, gCubeEdgeLength / 2);
+#if HAPTIC
+	gHaptics.init(gCubeEdgeLength, gStiffness, gCubeEdgeLength / 2);
+#endif
 
     // Set up the OpenGL graphics
     initGL();
@@ -177,13 +180,15 @@ void initScene()
     Sleep(100);
 
     // Tell the user what to do if the device is not calibrated
-    if (!gHaptics.isDeviceCalibrated())
+#if HAPTIC
+	if (!gHaptics.isDeviceCalibrated())
         MessageBox(NULL, 
                    // The next two lines are one long string
                    "Please home the device by extending\n"
                    "then pushing the arms all the way in.",
                    "Not Homed",
                    MB_OK);
+#endif
 
 
 	GetSystemTime(&lasttime);
