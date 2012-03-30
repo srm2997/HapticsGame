@@ -18,7 +18,7 @@
 #include <sstream>
 #include <shlobj.h>
 
-#define HAPTIC	0
+#define HAPTIC	1
 
 double NORTH = 1.0;
 double SOUTH = -1.0;
@@ -391,24 +391,25 @@ void drawGraphics()
 	}*/
 
 	// Draw right paddle (p1)
+	glPushMatrix();
 	glTranslatef( xposp1, yposp1, 0 );
 	glScalef( 0.5, 1, 1 );
 	glutSolidCube(gCubeEdgeLength);
-	glScalef( 2.0, 1, 1 );
-	glTranslatef( -xposp1, -yposp1, 0 );
+	glPopMatrix();
 
 	// Draw left paddle (p2)
+	glPushMatrix();
 	glTranslatef( xposp2, yposp2, 0 );
 	glScalef( 0.5, 1, 1 );
 	glutSolidCube(gCubeEdgeLength);
-	glScalef( 2.0, 1, 1 );	
-	glTranslatef( -xposp2, -yposp2, 0 );
+	glPopMatrix();
 
 	// Draw puck
+	glPushMatrix();
     glTranslatef( xposb, yposb, 0);
     //glutSolidCube(gCubeEdgeLength);
 	glutSolidSphere( gCubeEdgeLength / 2, 20, 10 );
-	glTranslatef(-xposb, -yposb, 0);
+	glPopMatrix();
 
 	// Draw top
 	//glDisable(GL_DEPTH_TEST);
@@ -428,17 +429,17 @@ void drawGraphics()
 	//glEnable(GL_DEPTH_TEST);
 	////glDepthMask(!GL_FALSE);
 	double width = ( EAST - WEST ) * 2;
+	glPushMatrix();
 	glTranslatef( 0, NORTH + width / 2, 0 );
 	glScalef( 1, 1, 1 / width / 2 );
 	glutSolidCube(width);
-	glScalef( 1, 1, width * 2 );
-	glTranslatef( 0, -(NORTH + width / 2), 0 );
+	glPopMatrix();
 
+	glPushMatrix();
 	glTranslatef( 0, (SOUTH - width / 2), 0 );
 	glScalef( 1, 1, 1 / width / 2 );
 	glutSolidCube( width );
-	glScalef( 1, 1, width * 2 );
-	glTranslatef( 0, -(SOUTH - width / 2), 0 );
+	glPopMatrix();
 
 	// Update puck position
 	UpdatePos();
@@ -462,7 +463,7 @@ void playSound( Sound sound ){
 			break;
 	}
 
-	PlaySound(path, NULL, SND_ASYNC | SND_FILENAME);
+	PlaySound(path, NULL, SND_ASYNC);
 }
 
 
