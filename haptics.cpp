@@ -250,8 +250,6 @@ void HapticsClass::cubeContact()
 	if( dobump > 0 ){
 		// Puck riccoched
 		m_forceServo[0] = 10;
-		m_forceServo[1] = 0;
-		m_forceServo[2] = 0;
 		dobump--;
 		return;
 	}
@@ -260,12 +258,8 @@ void HapticsClass::cubeContact()
 		// Was scored against
 		if( dojitter % 40 < 20 ){
 			m_forceServo[0] = 10;
-			m_forceServo[1] = 0;
-			m_forceServo[2] = 0;
 		}else{
 			m_forceServo[0] = -10;
-			m_forceServo[1] = 0;
-			m_forceServo[2] = 0;
 		}
 		dojitter--;
 		return;
