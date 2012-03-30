@@ -150,6 +150,13 @@ void glutKeyboard(unsigned char key, int x, int y)
 // Handle mouse movement
 void glutMouseMove( int x, int y){
 	yposp2 = (y - 250) / -(500 / 3.0);
+	if( yposp2 + gCubeEdgeLength / 2 > NORTH ){
+		yposp2 = NORTH - gCubeEdgeLength / 2;
+	}
+
+	if( yposp2 - gCubeEdgeLength / 2 < SOUTH ){
+		yposp2 = SOUTH + gCubeEdgeLength / 2;
+	}
 }
 
 // Scene setup
@@ -376,6 +383,12 @@ void drawGraphics()
 	gHaptics.getPosition( cp );
 
 	yposp1 = cp[1];
+	/*if( yposp1 + gCubeEdgeLength / 2 > NORTH ){
+		yposp1 = NORTH - gCubeEdgeLength / 2;
+	}
+	if( yposp1 -gCubeEdgeLength / 2 < SOUTH ){
+		yposp1 = SOUTH + gCubeEdgeLength / 2;
+	}*/
 
 	// Draw right paddle (p1)
 	glTranslatef( xposp1, yposp1, 0 );
