@@ -458,7 +458,7 @@ void playSound( Sound sound ){
 			strcat( path, "rightPaddleHit.wav");
 			break;
 		case SCORE:
-			strcat( path, "ballOut.wav");
+			strcat( path, "gruntScore.wav");
 			break;
 	}
 
