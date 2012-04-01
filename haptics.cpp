@@ -232,6 +232,7 @@ void HapticsClass::cubeContact()
     m_forceServo[Y] = 0; 
     m_forceServo[Z] = 0;
 
+	// Haptics for top and bottom of playable area
 	double paddle_top = m_positionApp[Y] + m_cubeEdgeLength / 2;
 	double paddle_bottom = m_positionApp[Y] - m_cubeEdgeLength / 2;
 
@@ -246,7 +247,7 @@ void HapticsClass::cubeContact()
 	sprintf( letters, "Force: %f      Y-Pos: %f\n", m_forceServo[Y], m_positionApp[Y]  );
 	OutputDebugString( letters );*/
 
-
+	// Haptics for ball hitting paddle
 	if( dobump > 0 ){
 		// Puck riccoched
 		m_forceServo[0] = 10;
@@ -254,7 +255,8 @@ void HapticsClass::cubeContact()
 		return;
 	}
 
-	if( dojitter > 0 ){
+	// Haptics for being scored on
+	if( dojitter > 0 && false ){
 		// Was scored against
 		if( dojitter % 40 < 20 ){
 			m_forceServo[0] = 10;
@@ -265,9 +267,10 @@ void HapticsClass::cubeContact()
 		return;
 	}
 
+	// 2.5 for Y and 1.5 for X is actually decent
 	
-	m_forceServo[Y] += (m_positionApp[Y] - m_ypos) * -5;
-	m_forceServo[X] += (m_positionApp[X] - m_xpos - m_paddleWidth * 1.5) * -5;
+	m_forceServo[Y] += (m_positionApp[Y] - m_ypos) * -2.5;
+	m_forceServo[X] += (m_positionApp[X] - m_xpos - m_paddleWidth * 1.5) * -1.5;
 	return;
 
 	if ( doPullDown > doPullUp ) {
@@ -295,27 +298,27 @@ void HapticsClass::cubeContact()
 
 	double d = m_xpos * m_xpos + m_ypos * m_ypos;
 
-	if ( m_ypos - m_positionApp[Y] > 0.0 && m_positionApp[Y]-prevY > 0.1 ) {
+	if ( m_ypos > m_positionApp[Y] && m_positionApp[Y] > prevY ) {
 		char letters[100];
-		sprintf( letters, "Moving Toward Up\n");
+		sprintf( letters, "Moving Toward Up %f\n", prevY);
 		OutputDebugString( letters );
-		m_forceServo[Y] += -2;
-	} else if ( m_ypos - m_positionApp[Y] < 0.0 && m_positionApp[Y]-prevY < 0.1 ) {
+	} else if ( m_ypos < m_positionApp[Y] && m_positionApp[Y] < prevY ) {
 		char letters[100];
-		sprintf( letters, "Moving Toward Down\n");
+		sprintf( letters, "Moving Toward Down %f\n", prevY);
 		OutputDebugString( letters );
-		m_forceServo[Y] += 2;
 	} else {
 		char letters[100];
 		sprintf( letters, "Not Moving Toward\n");
 		OutputDebugString( letters );
-
-		// add spring stiffness to force effect
 		
-		
+		if ( m_ypos - m_positionApp[Y] > 0.0 ) {
+			doPullUp += 20;
+		} else if ( m_ypos - m_positionApp[Y] < 0.0 ) {
+			doPullDown += 20;
+		}		
 	}
 
-	m_forceServo[X] += (m_positionApp[X] - m_xpos - m_paddleWidth * 1.5) * -5;
+	//m_forceServo[X] += (m_positionApp[X] - m_xpos - m_paddleWidth * 1.5) * -5;
 
 	prevY = m_positionApp[Y];
 }
