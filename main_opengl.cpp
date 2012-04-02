@@ -35,6 +35,8 @@ double yposp1, xposp1;
 double yposp2, xposp2;
 double xmov, ymov;
 int freeze;
+int mRot;
+int spin;
 SYSTEMTIME lasttime;
 
 
@@ -181,6 +183,8 @@ void initScene()
 	xmov = 0.7;
 	ymov = 0.7;
 	freeze = 0;
+	mRot = 0;
+	spin = 1;
 
     // Call the haptics initialization function
 #if HAPTIC
@@ -332,6 +336,7 @@ void BoundCheck( long double i ){
 	}
 
 	if( right >= EAST ){
+		spin = -spin;
 		if( top > yposp1 - halfEdge && bottom < yposp1 + halfEdge ){
 			xposb -= xmov * 2 * i / 1000.0;
 			xmov = -xmov;
@@ -347,6 +352,7 @@ void BoundCheck( long double i ){
 	}
 
 	if( left <= WEST ){
+		spin = -spin;
 		if( top > yposp2 - halfEdge && bottom < yposp2 + halfEdge ){
 			xposb -= xmov * 2 * i / 1000.0;
 			xmov = -xmov;
@@ -434,8 +440,10 @@ void drawGraphics()
 	// Draw puck
 	glPushMatrix();
     glTranslatef( xposb, yposb, 0);
+	glRotated( mRot, 0, 0, 1 );
+	mRot = (mRot + spin) % 360;
+	glutSolidSphere( gCubeEdgeLength / 2, 10, 10 );
     //glutSolidCube(gCubeEdgeLength);
-	glutSolidSphere( gCubeEdgeLength / 2, 20, 10 );
 	glPopMatrix();
 
 	// Draw top
