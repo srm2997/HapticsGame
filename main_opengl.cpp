@@ -34,6 +34,7 @@ double xposb, yposb;
 double yposp1, xposp1;
 double yposp2, xposp2;
 double xmov, ymov;
+int freeze;
 SYSTEMTIME lasttime;
 
 
@@ -64,6 +65,7 @@ void drawGraphics();
 void drawCursor();
 
 void glutMouseMove(int x, int y);
+void glutMouse( int button, int state, int x, int y );
 
 void playSound( Sound sound );
 
@@ -82,6 +84,7 @@ int main(int argc, char *argv[])
     glutIdleFunc(glutIdle);
     glutKeyboardFunc(glutKeyboard);
 	glutPassiveMotionFunc(glutMouseMove);
+	glutMouseFunc(glutMouse);
 
     
     // Set up handler to make sure teardown is done.
@@ -159,6 +162,12 @@ void glutMouseMove( int x, int y){
 	}
 }
 
+void glutMouse( int button, int state, int x, int y ){
+	if( button == 0 && freeze == 2 ){
+		freeze = 0;
+	}
+}
+
 // Scene setup
 void initScene()
 {
@@ -171,6 +180,7 @@ void initScene()
 	yposb = 0;
 	xmov = 0.7;
 	ymov = 0.7;
+	freeze = 0;
 
     // Call the haptics initialization function
 #if HAPTIC
@@ -274,12 +284,24 @@ long double Delta(const SYSTEMTIME st1, const SYSTEMTIME st2)
     return (long double)( ft2.ul.QuadPart - ft1.ul.QuadPart ) / 10000.0; // milliseconds
 }
 
-void Score(){
+void Score( int player ){
 	char letters[100];
 	sprintf( letters, "%i - %i", SCORE_P2, SCORE_P1  );
 	OutputDebugString( letters );
 	OutputDebugString("\n" );
 	playSound( SCORE );
+
+	// Reset ball movement
+	xmov = (player == 1 ? 0.7 : -0.7);
+	ymov = (ymov > 0 ? 0.7 : -0.7);
+
+	if( player == 1 ){
+		freeze = 2;
+		xposb = WEST + gCubeEdgeLength;
+	}else if( player == 2 ){
+		freeze = 1;
+		xposb = EAST - gCubeEdgeLength;
+	}
 }
 
 void BoundCheck( long double i ){
@@ -318,11 +340,8 @@ void BoundCheck( long double i ){
 			gHaptics.bump();
 			playSound( RIGHT_HIT );
 		}else{
-			xposb = 0;
-			xmov = 0.7;
-			ymov = 0.7;
 			SCORE_P2++;
-			Score();
+			Score(2);
 			gHaptics.jitter();
 		}
 	}
@@ -335,11 +354,8 @@ void BoundCheck( long double i ){
 			ymov *= 1.1;
 			playSound( LEFT_HIT );
 		}else{
-			xposb = 0;
-			xmov = -0.7;
-			ymov = 0.7;
 			SCORE_P1++;
-			Score();
+			Score(1);
 		}
 	}
 }
@@ -355,10 +371,21 @@ void UpdatePos(){
 //	OutputDebugString( letters );
 //	OutputDebugString("\n" );
 
-	xposb += xmov * i / 1000.0;
-	yposb += ymov * i / 1000.0;
+	if( freeze == 1 ){
+		if( gHaptics.isButtonDown() ){
+			freeze = 0;
+		}else{
+			yposb = yposp1;
+		}
+	}else if( freeze == 2 ){
+		yposb = yposp2;
+	}else{
+		xposb += xmov * i / 1000.0;
+		yposb += ymov * i / 1000.0;
 
-    BoundCheck( i );
+		BoundCheck( i );
+	}
+
 
 //	sprintf( letters, "%f", xmov * i / 1000 );
 //	OutputDebugString( letters );
