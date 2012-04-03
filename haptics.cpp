@@ -250,7 +250,7 @@ void HapticsClass::cubeContact()
 	// Haptics for ball hitting paddle
 	if( dobump > 0 ){
 		// Puck riccoched
-		m_forceServo[0] = 10;
+		m_forceServo[X] = 10;
 		dobump--;
 		return;
 	}
@@ -259,9 +259,9 @@ void HapticsClass::cubeContact()
 	if( dojitter > 0 && false ){
 		// Was scored against
 		if( dojitter % 40 < 20 ){
-			m_forceServo[0] = 10;
+			m_forceServo[X] = 10;
 		}else{
-			m_forceServo[0] = -10;
+			m_forceServo[X] = -10;
 		}
 		dojitter--;
 		return;
@@ -280,40 +280,33 @@ void HapticsClass::cubeContact()
 	}
 
 	if ( doPullDown > 0 ) {
-		//m_forceServo[Y] += (m_positionApp[Y] - m_ypos) * -5;
-		m_forceServo[Y] += -5;
+		if ( m_positionApp[Y] > m_ypos ) {
+			m_forceServo[Y] += -2.5 * (m_positionApp[Y] - m_ypos);
+		}
 		doPullDown--;
 	} else if ( doPullUp > 0 ) {
-		m_forceServo[Y] += 5;
+		if ( m_ypos > m_positionApp[Y] ) {
+			m_forceServo[Y] += 2.5 * (m_ypos - m_positionApp[Y]);
+		}
 		doPullUp--;
 	}
 
-
-
-
-//	char letters[100];
-//	sprintf( letters, "%f", m_xpos  );
-//	OutputDebugString( letters );
-//	OutputDebugString("\n" );
-
 	double d = m_xpos * m_xpos + m_ypos * m_ypos;
 
-	if ( m_ypos > m_positionApp[Y] && m_positionApp[Y] > prevY ) {
+	if ( m_ypos > m_positionApp[Y] && m_positionApp[Y] > prevY + 0.002 ) {
 		char letters[100];
-		sprintf( letters, "Moving Toward Up %f\n", prevY);
+		sprintf( letters, "Stopping Pull Up %f\n", m_positionApp[Y]-prevY);
 		OutputDebugString( letters );
-	} else if ( m_ypos < m_positionApp[Y] && m_positionApp[Y] < prevY ) {
+		doPullUp = -10;
+	} else if ( m_ypos < m_positionApp[Y] && m_positionApp[Y] < prevY - 0.002 ) {
 		char letters[100];
-		sprintf( letters, "Moving Toward Down %f\n", prevY);
+		sprintf( letters, "Stopping Pull Down %f\n", prevY-m_positionApp[Y]);
 		OutputDebugString( letters );
-	} else {
-		char letters[100];
-		sprintf( letters, "Not Moving Toward\n");
-		OutputDebugString( letters );
-		
-		if ( m_ypos - m_positionApp[Y] > 0.0 ) {
+		doPullDown = -10;
+	} else {		
+		if ( m_ypos > m_positionApp[Y] && doPullUp < 5 ) {
 			doPullUp += 20;
-		} else if ( m_ypos - m_positionApp[Y] < 0.0 ) {
+		} else if ( m_ypos < m_positionApp[Y] && doPullDown < 5) {
 			doPullDown += 20;
 		}		
 	}
