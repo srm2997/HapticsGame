@@ -256,7 +256,7 @@ void HapticsClass::cubeContact()
 	}
 
 	// Haptics for being scored on
-	if( dojitter > 0 && false ){
+	if( dojitter > 0 ){
 		// Was scored against
 		if( dojitter % 40 < 20 ){
 			m_forceServo[X] = 10;
