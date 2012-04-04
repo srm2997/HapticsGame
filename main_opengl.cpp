@@ -17,8 +17,12 @@
 #include "haptics.h"
 #include <sstream>
 #include <shlobj.h>
+#include <iostream>
+#include <fstream>
 
-#define HAPTIC	1
+#define HAPTIC	0
+#define PCPLAYER 0
+#define REBOUNDS 100
 
 double NORTH = 1.0;
 double SOUTH = -1.0;
@@ -27,6 +31,9 @@ double WEST = -1.5;
 
 int SCORE_P1 = 0;
 int SCORE_P2 = 0;
+
+int hits = 0;
+int misses = 0;
 
 enum Sound { LEFT_HIT, RIGHT_HIT, SCORE };
 
@@ -38,6 +45,8 @@ int freeze;
 int mRot;
 int spin;
 SYSTEMTIME lasttime;
+
+std::ofstream myfile;
 
 
 
@@ -148,12 +157,17 @@ void glutKeyboard(unsigned char key, int x, int y)
 
     if (key == 27) // esc key
     {
+		#if PCPLAYER
+			myfile << std::endl;
+			myfile.close();
+		#endif
         exit(0);
     }
 }
 
 // Handle mouse movement
 void glutMouseMove( int x, int y){
+#if !PCPLAYER
 	yposp2 = (y - 250) / -(500 / 3.0);
 	if( yposp2 + gCubeEdgeLength / 2 > NORTH ){
 		yposp2 = NORTH - gCubeEdgeLength / 2;
@@ -162,6 +176,7 @@ void glutMouseMove( int x, int y){
 	if( yposp2 - gCubeEdgeLength / 2 < SOUTH ){
 		yposp2 = SOUTH + gCubeEdgeLength / 2;
 	}
+#endif
 }
 
 void glutMouse( int button, int state, int x, int y ){
@@ -185,6 +200,13 @@ void initScene()
 	freeze = 0;
 	mRot = 0;
 	spin = 1;
+
+	#if PCPLAYER
+		char path[MAX_PATH];
+		SHGetFolderPathA( NULL, CSIDL_PROFILE, NULL, 0, path );
+		strcat( path, "/Documents/HapticsGame/Results.txt");
+		myfile.open( path, std::ios.app );
+	#endif
 
     // Call the haptics initialization function
 #if HAPTIC
@@ -344,13 +366,40 @@ void BoundCheck( long double i ){
 			ymov *= 1.1;
 			gHaptics.bump();
 			playSound( RIGHT_HIT );
+			hits++;
 		}else{
 			SCORE_P2++;
 			Score(2);
 			gHaptics.jitter();
+			misses++;
 		}
+		
+		#if PCPLAYER
+			char letters[100];
+			sprintf( letters, "Hits: %i    Misses: %i\n", hits, misses  );
+			myfile << hits << ", " << misses << std::endl;
+
+			OutputDebugString( letters );
+			if( hits + misses >= REBOUNDS ){
+				sprintf( letters, "Hits: %f%%    Misses: %f%%\n", hits * 100.0 / REBOUNDS, misses * 100.0 / REBOUNDS );
+				OutputDebugString( letters );
+				myfile << std::endl;
+				myfile.close();
+				exit(0);
+			}
+		#endif
 	}
 
+#if PCPLAYER
+	if( left <= WEST ){
+		spin = -spin;
+		xposb -= xmov * 2 * i / 1000.0;
+		xmov = -xmov;
+		xmov *= 1.1;
+		ymov *= 1.1;
+		playSound( LEFT_HIT );
+	}
+#else
 	if( left <= WEST ){
 		spin = -spin;
 		if( top > yposp2 - halfEdge && bottom < yposp2 + halfEdge ){
@@ -364,6 +413,7 @@ void BoundCheck( long double i ){
 			Score(1);
 		}
 	}
+#endif
 }
 
 void UpdatePos(){
@@ -391,6 +441,10 @@ void UpdatePos(){
 
 		BoundCheck( i );
 	}
+
+	#if PCPLAYER
+		yposp2 = yposb;
+	#endif
 
 
 //	sprintf( letters, "%f", xmov * i / 1000 );
