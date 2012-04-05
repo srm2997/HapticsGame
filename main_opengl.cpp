@@ -21,7 +21,7 @@
 #include <fstream>
 
 #define HAPTIC	1
-#define PCPLAYER 0
+#define PCPLAYER 1
 #define REBOUNDS 100
 
 double NORTH = 1.0;
@@ -345,6 +345,9 @@ void BoundCheck( long double i ){
 //	}
 	if( top > NORTH ){
 		yposb -= ymov * 2 * i / 1000.0;
+		if( yposb + halfEdge > NORTH ){
+			yposb = NORTH - halfEdge;
+		}
 		ymov = -ymov;
 	}
 //	if( left < WEST ){
@@ -353,6 +356,9 @@ void BoundCheck( long double i ){
 //	}
 	if( bottom < SOUTH ){
 		yposb -= ymov * 2 * i / 1000.0;
+		if( yposb - halfEdge < SOUTH ){
+			yposb = SOUTH + halfEdge;
+		}
 		ymov = -ymov;
 
 	}
@@ -549,7 +555,9 @@ void playSound( Sound sound ){
 			strcat( path, "rightPaddleHit.wav");
 			break;
 		case SCORE:
-			strcat( path, "gruntScore.wav");
+			#if !PCPLAYER
+				strcat( path, "gruntScore.wav");
+			#endif
 			break;
 	}
 
