@@ -52,7 +52,8 @@ HapticsClass::HapticsClass( double& xposb, double& yposb)
 	  dobump(0),
 	  dojitter(0),
 	  doPullDown(0),
-	  doPullUp(0)
+	  doPullUp(0),
+	  doFire(0)
 {
     for (int i = 0; i < 3; i++)
         m_positionServo[i] = 0;
@@ -216,6 +217,10 @@ void HapticsClass::jitter(){
 	dojitter += 200;
 }
 
+void HapticsClass::fire(){
+	doFire = 100;
+}
+
 // Here is where the heavy calculations are done.  This function is
 // called from ContactCB to calculate the forces based on current
 // cursor position and cube dimensions.  A simple spring model is
@@ -264,6 +269,13 @@ void HapticsClass::cubeContact()
 			m_forceServo[X] = -10;
 		}
 		dojitter--;
+		return;
+	}
+
+	// Haptics for releasing the ball
+	if( doFire > 0 ){
+		m_forceServo[X] = sin( 50 * 3.14159 * doFire / 2500 ) * -10;
+		doFire--;
 		return;
 	}
 

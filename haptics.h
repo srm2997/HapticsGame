@@ -65,6 +65,7 @@ public:
 
 	void bump();
 	void jitter();
+	void fire();
 
 private:
     // Move data between servo and app variables
@@ -121,6 +122,7 @@ private:
 	int dojitter;
 	int doPullDown;
 	int doPullUp;
+	int doFire;
 };
 
 #endif // HAPTICS_H

@@ -20,7 +20,7 @@
 #include <iostream>
 #include <fstream>
 
-#define HAPTIC	0
+#define HAPTIC	1
 #define PCPLAYER 0
 #define REBOUNDS 100
 
@@ -430,6 +430,7 @@ void UpdatePos(){
 	if( freeze == 1 ){
 		if( gHaptics.isButtonDown() ){
 			freeze = 0;
+			gHaptics.fire();
 		}else{
 			yposb = yposp1;
 		}
