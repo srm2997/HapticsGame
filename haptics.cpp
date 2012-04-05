@@ -274,7 +274,9 @@ void HapticsClass::cubeContact()
 
 	// Haptics for releasing the ball
 	if( doFire > 0 ){
-		m_forceServo[X] = sin( 50 * 3.14159 * doFire / 2500 ) * -10;
+		// 
+		// m_forceServo[X] = sin( doFire * 50 * 3.14159 / 2500 ) * -10;
+		m_forceServo[X] = sin( doFire * 0.0628318530717958647692528676655900576839433879875021 ) * -10;
 		doFire--;
 		return;
 	}
